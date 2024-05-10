@@ -3,11 +3,11 @@ const express =require("express");
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
 const cors=require("cors");
+const app = express();
 const{connectMongoDb}=require("./connectDB/connection")
 require('dotenv').config();
 const ACTIONS = require("./utils/Actions")
 const apiRouter = require("./routes")
-const app = express();
 const server = createServer(app);
 const io = new Server(server);
 app.use(cors());
