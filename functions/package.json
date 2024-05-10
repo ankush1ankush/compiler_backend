@@ -2,16 +2,18 @@
   "name": "functions",
   "description": "Cloud Functions for Firebase",
   "scripts": {
-        "start": "node index.js"
+    "start": "node index.js"
   },
   "engines": {
     "node": "18"
   },
   "main": "index.js",
   "dependencies": {
-    "cros": "^1.0.1",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
+    "mongodb": "^6.6.0",
     "mongoose": "^8.1.1",
+    "socket.io": "^4.7.5",
     "uuid": "^9.0.1"
   },
   "private": true

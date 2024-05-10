@@ -4,10 +4,17 @@ const fs= require('fs');
 
 const outputPath =path.join(__dirname,"outputs")
 
-
-if(!fs.existsSync(outputPath)){
-    fs.mkdirSync(outputPath,{recursive:true})
+if(!fs.exists(outputPath, ()=>{
+      console.log("checking outPut directory")
+    })){
+    fs.mkdir(outputPath,{recursive:true},(err) => {
+        if (err) {
+            return console.error(err);
+        }
+        console.log('Directory created successfully!');
+    })
 }
+
 
 const executeJavaScript = (filepath, inputFilePath) => {
     const jobId = path.basename(filepath).split(".")[0];

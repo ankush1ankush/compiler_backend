@@ -1,6 +1,7 @@
 
 const express =require("express");
-
+const { createServer } = require('node:http');
+const { Server } = require('socket.io');
 const cors=require("cors");
 const{connectMongoDb}=require("./connection")
 const {generateFile} =require("./GenerateFile")
@@ -12,11 +13,12 @@ const {executeJavaScript}=require("./executeJavaScript")
 const {executeJava}=require("./executeJava");
 const {Job}=require("./models/job")
 const {deleteFile}=require("./deleteFile")
-
+const ACTIONS = require("./Actions")
 
 
 const app = express();
-
+const server = createServer(app);
+const io = new Server(server);
 
 app.use(cors());
 app.use(express.json());
@@ -24,16 +26,60 @@ app.use(express.json());
 
 
 
-connectMongoDb("mongodb://localhost:27017/CompilerApp").catch(err => console.log(err));
+connectMongoDb("mongodb+srv://ankush1ankush:D5g0duYdmoGlSF32@cluster0.9gvgkgj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0").catch(err => console.log(err));
+
+
+
+
+const userSocketMap ={};
+
+const getAllConnectedClients = (roomId)=>{
+    return Array.from( io.sockets.adapter.rooms.get(roomId) || []).map(
+        (socketId)=>{
+            return {
+               socketId,
+               username : userSocketMap[socketId],
+            }
+        }
+    )
+}
+
+io.on('connection', (socket) => {
+     console.log('a user connected', socket.id);
+     socket.on(ACTIONS.JOIN,({roomId,userName})=>{
+        userSocketMap[socket.id]=userName;
+        socket.join(roomId) // joinning the socket in
+        const clients = getAllConnectedClients(roomId); // getting all socket present in this room
+        clients.forEach(({socketId})=>{
+            io.to(socketId).emit(ACTIONS.JOINED,{
+                clients,
+                userName,
+                socketId : socket.id
+            }) 
+        })
+        console.log(" clients :");
+        console.log(clients)
+        socket.join(roomId);   // joinning the current socket the roomID 
+     })
+     socket.on('disconnecting',()=>{
+        const rooms = [...socket.rooms];
+        
+        rooms.forEach((roomId)=>{
+            socket.in(roomId).emit(ACTIONS.DISCONNECTED,{
+                socketId: socket.id,
+                username: userSocketMap[socket.id]
+            })
+        })
+        delete userSocketMap[socket.id];
+        socket.leave();
+     })
+});
 
 
 app.get("/", (req, res) => {
     //console.log("hello");
     res.json({message:"hello world"});
   });
-
-
-
 app.post("/run", async (req,res)=>{
 
 
@@ -183,7 +229,7 @@ app.get("/status", async (req,res)=>{
    
   if(job===undefined)
   {
-    return res.status(404).json({success:false,error:"invalid job id"});
+    return res.status(200).json({success:false,error:"invalid job id"});
   }
    
   //console.log(JSON.parse(job.output));
@@ -203,7 +249,7 @@ app.get("/status", async (req,res)=>{
 app.get("/delete", async (req,res)=>{
   
   
-    const jobId=req.query.id;
+  const jobId=req.query.id;
     
     
 
@@ -223,7 +269,7 @@ app.get("/delete", async (req,res)=>{
      console.log(job);
     if(job===undefined)
     {
-      return res.status(404).json({success:false,error:"invalid job id"});
+      return res.status(200).json({success:false,error:"invalid job id"});
     }
      
     //console.log(JSON.parse(job.output));
@@ -251,6 +297,6 @@ app.get("/delete", async (req,res)=>{
    
 })
 
-app.listen(5000,()=>{
+server.listen(process.env.PORT || 5000,()=>{
     console.log("listenning to the port no 5000")
 })

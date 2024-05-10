@@ -3,9 +3,15 @@ const fs=require('fs')
 const {v4:uuid}=require('uuid')
 const dirCodes=path.join(__dirname,"codes"); // creating path to the folder
 
-if(!fs.existsSync(dirCodes))                    // checking if code folder exist for path
-{
-    fs.mkdirSync(dirCodes,{recursive: true}); // making code folder if it does not exist
+if(!fs.exists(dirCodes, ()=>{
+      console.log("checking outPut directory")
+    })){
+    fs.mkdir(dirCodes,{recursive:true},(err) => {
+        if (err) {
+            return console.error(err);
+        }
+        console.log('Directory created successfully!');
+    })
 }
 
 const generateFile = async (format, code)=>{
