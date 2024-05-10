@@ -1,8 +1,11 @@
 const {exec}=require("child_process");
 const path =require('path');
-const fs= require('fs');
+const { dirname } = require('path');
+const appDir = dirname(require.main.filename);
 
-const outputPath =path.join(__dirname,"outputs")
+const fs= require('fs');
+const outputPath =path.join(appDir,"outputs")
+
 
 if(!fs.exists(outputPath, ()=>{
       console.log("checking outPut directory")
@@ -15,19 +18,21 @@ if(!fs.exists(outputPath, ()=>{
     })
 }
 
-
-const executePy =(filepath ,inputFilePath)=>{
+const executeCpp =(filepath ,inputFilePath)=>{
    
-  
+   console.log(appDir);
    // console.log(inputFilePath);
     //5ebe9699-ac2d-4af9-8bc3-3f93742aa066.cpp
-  
+    const jobId=path.basename(filepath).split(".")[0];
+    
+    const outPath= path.join(outputPath,`${jobId}.out`)
 
     return new Promise((resolve,reject)=>{
 
         process.chdir(outputPath); // Change the working directory
-
-        exec(`python ${filepath} < ${inputFilePath}`,(error,stdout,stderr)=>{
+        //const command1= `g++ ${filepath} -o ${outPath} && cd ${outputPath} && ./${jobId}.out`
+        const command2=`g++ ${filepath} -o ${outPath} &&  ${jobId}.out < ${inputFilePath}`
+        exec(command2 ,(error,stdout,stderr)=>{
             if(error)
             {
                 reject({error,stderr});
@@ -45,5 +50,5 @@ const executePy =(filepath ,inputFilePath)=>{
 }
 
 module.exports={
-    executePy
+    executeCpp
 }

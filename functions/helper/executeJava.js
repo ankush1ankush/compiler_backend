@@ -2,10 +2,6 @@ const {exec}=require("child_process");
 const path =require('path');
 const fs= require('fs');
 
-
-
-
-
 const executeJava = (filepath, inputFilePath) => {
     const jobId = path.basename(filepath).split(".")[0];
     const javaPath = `${jobId}.java`

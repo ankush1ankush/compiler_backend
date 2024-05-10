@@ -1,7 +1,9 @@
 const fs=require('fs')
 
 const path =require('path');
-const outputPath =path.join(__dirname,"outputs")
+const { dirname } = require('path');
+const appDir = dirname(require.main.filename);
+const outputPath =path.join(appDir,"outputs")
 
 
 

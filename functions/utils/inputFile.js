@@ -1,10 +1,9 @@
 const path=require('path')
-
 const fs =require('fs');
-
 const {v4:uuid}=require("uuid");
-
-const dirInput=path.join(__dirname,"input");
+const { dirname } = require('path');
+const appDir = dirname(require.main.filename);
+const dirInput=path.join(appDir,"input");
 
 if(!fs.existsSync(dirInput))
 {

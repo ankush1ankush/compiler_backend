@@ -1,7 +1,10 @@
 const path=require('path')
 const fs=require('fs')
 const {v4:uuid}=require('uuid')
-const dirCodes=path.join(__dirname,"codes"); // creating path to the folder
+
+const { dirname } = require('path');
+const appDir = dirname(require.main.filename);
+const dirCodes=path.join(appDir,"codes"); // creating path to the folder
 
 if(!fs.exists(dirCodes, ()=>{
       console.log("checking outPut directory")

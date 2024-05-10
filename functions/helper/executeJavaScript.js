@@ -1,8 +1,9 @@
 const {exec}=require("child_process");
 const path =require('path');
 const fs= require('fs');
-
-const outputPath =path.join(__dirname,"outputs")
+const { dirname } = require('path');
+const appDir = dirname(require.main.filename);
+const outputPath =path.join(appDir,"outputs")
 
 if(!fs.exists(outputPath, ()=>{
       console.log("checking outPut directory")
